@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "580206646727",
+    "project_id": "tvapp-717c3",
+    "storage_bucket": "tvapp-717c3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:580206646727:android:65878db3c826f506e8b5e2",
+        "android_client_info": {
+          "package_name": "com.tvtest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAI_1NARt-Kd14H7lWWppi-Q3_OPhnPtek"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
