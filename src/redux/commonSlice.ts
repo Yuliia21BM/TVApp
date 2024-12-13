@@ -1,62 +1,39 @@
-import {createSlice, createAsyncThunk, PayloadAction} from '@reduxjs/toolkit';
-import {fetchBannersFromRemoteConfig} from './operations';
-
-interface Banner {
-  id: string;
-  title: string;
-  description: string;
-  image: string;
-  isActive?: boolean;
-}
-
-interface CommonState {
-  banners: Banner[];
-  focusedItem: Banner | null;
-  loading: boolean;
-  error: string | null;
-}
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {Banner, CommonState} from './types';
+import {fetchBanners} from './operations';
 
 const initialState: CommonState = {
   banners: [],
+  continueWatching: {
+    title: 'Continue Watching',
+    id: 'continue_watching',
+    data: [],
+  },
   focusedItem: null,
   loading: false,
   error: null,
 };
 
-// Thunk for fetching banners
-export const fetchBanners = createAsyncThunk(
-  'common/fetchBanners',
-  async () => {
-    const banners = await fetchBannersFromRemoteConfig(); // Use the function from operations.ts
-    return banners;
-  },
-);
-
 const commonSlice = createSlice({
   name: 'common',
   initialState,
   reducers: {
-    addBanner: (state, action: PayloadAction<Banner>) => {
-      state.banners.push(action.payload);
-    },
-    updateBanner: (state, action: PayloadAction<Banner>) => {
-      const index = state.banners.findIndex(b => b.id === action.payload.id);
-      if (index !== -1) {
-        state.banners[index] = action.payload;
+    updateContinueWatching: (state, action: PayloadAction<Banner>) => {
+      const index = state.continueWatching.data.findIndex(
+        b => b.id === action.payload.id,
+      );
+      if (index === -1) {
+        state.continueWatching.data.push(action.payload);
       }
+      state.continueWatching.data[index] = action.payload;
     },
-    removeBanner: (state, action: PayloadAction<string>) => {
-      state.banners = state.banners.filter(b => b.id !== action.payload);
+    removeContinueWatchingBanner: (state, action: PayloadAction<number>) => {
+      state.continueWatching.data = state.continueWatching.data.filter(
+        b => b.id !== action.payload,
+      );
     },
-    setActiveBanner: (state, action: PayloadAction<string>) => {
-      state.banners.forEach(b => {
-        b.isActive = b.id === action.payload;
-      });
-      state.focusedItem =
-        state.banners.find(b => b.id === action.payload) || null;
-    },
-    clearFocusedItem: state => {
-      state.focusedItem = null;
+    setFocusedItem: (state, action: PayloadAction<Banner>) => {
+      state.focusedItem = action.payload;
     },
   },
   extraReducers: builder => {
@@ -77,11 +54,9 @@ const commonSlice = createSlice({
 });
 
 export const {
-  addBanner,
-  updateBanner,
-  removeBanner,
-  setActiveBanner,
-  clearFocusedItem,
+  updateContinueWatching,
+  removeContinueWatchingBanner,
+  setFocusedItem,
 } = commonSlice.actions;
 
 export default commonSlice.reducer;

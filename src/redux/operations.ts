@@ -1,21 +1,31 @@
 import remoteConfig from '@react-native-firebase/remote-config';
+import {createAsyncThunk} from '@reduxjs/toolkit';
+import {Row} from './types';
 
-// Function to fetch and parse banner data from Firebase Remote Config
 export const fetchBannersFromRemoteConfig = async (): Promise<any[]> => {
   try {
-    // Fetch and activate remote config
     await remoteConfig().fetchAndActivate();
 
-    // Get the banners data (assuming the key is 'banners')
-    const bannerData = await remoteConfig().getValue('data');
+    const bannerData = remoteConfig().getValue('data');
 
-    // Parse the banners data (assuming it's a JSON string)
-    const parsedBanners = JSON.parse(bannerData.asString());
-    console.log('parsedBanners', parsedBanners);
+    const parsedBanners = await JSON.parse(bannerData.asString());
 
-    return parsedBanners?.list;
+    return parsedBanners?.['rows '];
   } catch (error) {
     console.error('Error fetching banners from remote config:', error);
     throw error;
   }
 };
+
+export const fetchBanners = createAsyncThunk(
+  'common/fetchBanners',
+  async () => {
+    const rawBanners = await fetchBannersFromRemoteConfig();
+    const formattedBanners: Row[] = rawBanners.map((raw: any) => ({
+      title: raw.title,
+      id: raw.id.toString(),
+      data: raw.items, // Ensure raw.items matches Banner[]
+    }));
+    return formattedBanners;
+  },
+);
