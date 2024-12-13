@@ -13,32 +13,38 @@ import {
   NavigationContainer,
   createNavigationContainerRef,
 } from '@react-navigation/native';
-import {AppStackParamListTV, STACK_SCREENS_TV} from './IRoot';
-import {HomeScreenTV, EpisodeScreenTV} from '../screens';
+import {AppStackParamList, STACK_SCREENS} from './IRoot';
+import {HomeScreen, EpisodeScreen} from '../screens';
 import {NetworkError} from '../components';
 
-const StackTV = createNativeStackNavigator<AppStackParamListTV>();
+const StackTV = createNativeStackNavigator<AppStackParamList>();
 
 export const navigationRef = createNavigationContainerRef();
 
 const ComponentsTV = {
-  HomeScreen: HomeScreenTV,
-  EpisodeScreen: EpisodeScreenTV,
+  HomeScreen: HomeScreen,
+  EpisodeScreen: EpisodeScreen,
 };
 
 function Root(): React.JSX.Element {
   const [isConnected, setIsConnected] = useState<boolean | null>(true);
+
+  useEffect(() => {
+    NetInfo.addEventListener(value => {
+      return setIsConnected(value.isConnected);
+    });
+  }, []);
 
   return (
     <View style={styles.root}>
       <NavigationContainer ref={navigationRef}>
         <StackTV.Navigator screenOptions={{headerShown: false}}>
           <StackTV.Screen
-            name={STACK_SCREENS_TV.HOME_SCREEN}
+            name={STACK_SCREENS.HOME_SCREEN}
             component={ComponentsTV.HomeScreen}
           />
           <StackTV.Screen
-            name={STACK_SCREENS_TV.EPISODE_SCREEN}
+            name={STACK_SCREENS.EPISODE_SCREEN}
             component={ComponentsTV.EpisodeScreen}
           />
         </StackTV.Navigator>

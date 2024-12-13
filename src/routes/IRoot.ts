@@ -1,7 +1,10 @@
-export enum STACK_SCREENS_TV {
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+
+export enum STACK_SCREENS {
   HOME_SCREEN = 'HomeScreen',
   EPISODE_SCREEN = 'EpisodeScreen',
 }
-export type AppStackParamListTV = {
-  [key in STACK_SCREENS_TV]: undefined;
+export type AppStackParamList = {
+  [key in STACK_SCREENS]: undefined;
 };
+export type StackNavigationProps = NativeStackNavigationProp<AppStackParamList>;
