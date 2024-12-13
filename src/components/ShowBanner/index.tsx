@@ -1,13 +1,14 @@
-import {memo, useCallback, useRef} from 'react';
-import {Banner} from '../../redux/types';
-import {STACK_SCREENS, StackNavigationProps} from '../../routes/IRoot';
-import {Animated, TouchableOpacity} from 'react-native';
+import React, {memo, useCallback, useRef} from 'react';
+import {Animated, Text, TouchableOpacity, View} from 'react-native';
+import FastImage from 'react-native-fast-image';
 import {useReduxDispatch} from '../../redux/store';
 import {setFocusedItem} from '../../redux/commonSlice';
-import FastImage from 'react-native-fast-image';
+import {STACK_SCREENS, StackNavigationProps} from '../../routes/IRoot';
+import {Banner, BannerStatus} from '../../redux/types';
 import {styles} from './styles';
+import {StatusColors} from '../../utils/Colors';
 
-export const ShowBunner = memo(
+export const ShowBanner = memo(
   ({
     item,
     index,
@@ -60,6 +61,15 @@ export const ShowBunner = memo(
           {transform: [{scale: scaleAnim}]},
           focusedIndex === index && styles.cardActive,
         ]}>
+        {item.status && (
+          <View
+            style={[
+              styles.statusContainer,
+              {backgroundColor: StatusColors[item.status as BannerStatus]},
+            ]}>
+            <Text style={styles.statusText}>{item.status}</Text>
+          </View>
+        )}
         <TouchableOpacity
           style={styles.card}
           onFocus={() => handleFocus(item, index)}

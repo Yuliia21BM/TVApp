@@ -10,7 +10,7 @@ export const fetchBannersFromRemoteConfig = async (): Promise<any[]> => {
 
     const parsedBanners = await JSON.parse(bannerData.asString());
 
-    return parsedBanners?.['rows '];
+    return parsedBanners?.rows;
   } catch (error) {
     console.error('Error fetching banners from remote config:', error);
     throw error;

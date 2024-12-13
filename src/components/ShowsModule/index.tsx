@@ -4,7 +4,7 @@ import {StackNavigationProps} from '../../routes/IRoot';
 import {FlatList, Text, View} from 'react-native';
 import {SCALE, SCREEN_HEIGHT} from '../../utils/Constants';
 import {styles} from './styles';
-import {ShowBunner} from '../ShowBunner';
+import {ShowBanner} from '../ShowBanner';
 
 export const ShowsModule = memo(
   ({item, navigation}: {item: Row; navigation: StackNavigationProps}) => {
@@ -16,7 +16,7 @@ export const ShowsModule = memo(
         <FlatList
           data={item.data}
           renderItem={({item: show, index}) => (
-            <ShowBunner
+            <ShowBanner
               item={show}
               index={index}
               setFocusedIndex={setFocusedIndex}

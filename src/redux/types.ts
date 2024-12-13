@@ -3,6 +3,12 @@ type Video = {
   title: string;
   src: string;
 };
+
+export enum BannerStatus {
+  TOP = 'TOP',
+  NEW = 'NEW',
+  EXCLUSIVE = 'EXCLUSIVE',
+}
 export interface Banner {
   id: number;
   title: string;
@@ -12,6 +18,7 @@ export interface Banner {
   videos: Video[];
   time?: number;
   lastVideoIndex?: number;
+  status: BannerStatus | null;
 }
 
 export type Row = {

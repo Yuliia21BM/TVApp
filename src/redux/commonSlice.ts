@@ -19,37 +19,60 @@ const commonSlice = createSlice({
   initialState,
   reducers: {
     updateContinueWatching: (state, action: PayloadAction<Banner>) => {
-      const index = state.continueWatching.data.findIndex(
+      const existingBannerIndex = state.continueWatching.data.findIndex(
         b => b.id === action.payload.id,
       );
-      if (index === -1) {
-        state.continueWatching.data.push(action.payload);
-      }
-      state.continueWatching.data[index] = action.payload;
+
+      const updatedData =
+        existingBannerIndex === -1
+          ? [action.payload, ...state.continueWatching.data]
+          : state.continueWatching.data.map((b, index) =>
+              index === existingBannerIndex ? action.payload : b,
+            );
+
+      return {
+        ...state,
+        continueWatching: {
+          ...state.continueWatching,
+          data: updatedData,
+        },
+      };
     },
     removeContinueWatchingBanner: (state, action: PayloadAction<number>) => {
-      state.continueWatching.data = state.continueWatching.data.filter(
+      const updatedData = state.continueWatching.data.filter(
         b => b.id !== action.payload,
       );
+
+      return {
+        ...state,
+        continueWatching: {
+          ...state.continueWatching,
+          data: updatedData,
+        },
+      };
     },
-    setFocusedItem: (state, action: PayloadAction<Banner>) => {
-      state.focusedItem = action.payload;
-    },
+    setFocusedItem: (state, action: PayloadAction<Banner>) => ({
+      ...state,
+      focusedItem: action.payload,
+    }),
   },
   extraReducers: builder => {
     builder
-      .addCase(fetchBanners.pending, state => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchBanners.fulfilled, (state, action) => {
-        state.loading = false;
-        state.banners = action.payload;
-      })
-      .addCase(fetchBanners.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed to fetch banners';
-      });
+      .addCase(fetchBanners.pending, state => ({
+        ...state,
+        loading: true,
+        error: null,
+      }))
+      .addCase(fetchBanners.fulfilled, (state, action) => ({
+        ...state,
+        loading: false,
+        banners: action.payload,
+      }))
+      .addCase(fetchBanners.rejected, (state, action) => ({
+        ...state,
+        loading: false,
+        error: action.error.message || 'Failed to fetch banners',
+      }));
   },
 });
 
