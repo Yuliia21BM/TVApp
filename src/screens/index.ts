@@ -1,2 +1,2 @@
-export {HomeScreenTV} from './HomeScreenTV.tsx';
-export {EpisodeScreenTV} from './EpisodeScreenTV.tsx';
+export {HomeScreen} from './HomeScreen';
+export {EpisodeScreen} from './EpisodeScreen';
