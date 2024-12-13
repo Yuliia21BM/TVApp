@@ -2050,11 +2050,6 @@
   resolved "https://registry.yarnpkg.com/@react-native-firebase/remote-config/-/remote-config-21.6.1.tgz#1a5c9e002bf896c74f48b592735a6c4f1a500d3f"
   integrity sha512-0SfB+8qXAwSH3Eg5G3rCINmqsmRSDlKKxb182jxHgcml4EiYxbak9F0LDB81mAT9t1xpUhn4gBz42KL32YmZDA==
 
-"@react-native-masked-view/masked-view@^0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@react-native-masked-view/masked-view/-/masked-view-0.3.2.tgz#7064533a573e3539ec912f59c1f457371bf49dd9"
-  integrity sha512-XwuQoW7/GEgWRMovOQtX3A4PrXhyaZm0lVUiY8qJDvdngjLms9Cpdck6SmGAUNqQwcj2EadHC1HwL0bEyoa/SQ==
-
 "@react-native-tvos/virtualized-lists@0.76.0-0":
   version "0.76.0-0"
   resolved "https://registry.yarnpkg.com/@react-native-tvos/virtualized-lists/-/virtualized-lists-0.76.0-0.tgz#2fb6ce80c28f0a038dce333768d26c5eabbf8233"

@@ -1,5 +1,6 @@
 import React, {useEffect, useCallback, useState} from 'react';
 import {FlatList, View, ActivityIndicator} from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import {useReduxDispatch, useReduxSelector} from '../../redux/store';
 import {selectAllFromCommon} from '../../redux/selectors';
 import {type Row} from '../../redux/types';
@@ -18,9 +19,11 @@ export const HomeScreen = ({
   const {loading, error, focusedItem, banners, continueWatching} =
     useReduxSelector(selectAllFromCommon);
   const [rows, setRows] = useState<Row[]>([]);
+
   useEffect(() => {
     dispatch(fetchBanners());
   }, [dispatch]);
+
   useEffect(() => {
     const newRows =
       continueWatching.data.length > 0
@@ -44,11 +47,23 @@ export const HomeScreen = ({
   }
 
   if (error) {
-    <ErrorScreen error={error} />;
+    return <ErrorScreen error={error} />;
   }
 
   return (
     <View style={styles.container}>
+      <LinearGradient
+        colors={['#150A35', 'rgba(21, 10, 53, 0)']}
+        style={styles.bottomGradient}
+        start={{x: 0.5, y: 1}}
+        end={{x: 0.5, y: 0}}
+      />
+      <LinearGradient
+        colors={['#150A35', 'rgba(21, 10, 53, 0)']}
+        style={styles.leftGradient}
+        start={{x: 0, y: 0.5}}
+        end={{x: 1, y: 0.5}}
+      />
       <HomeHeader focusedItem={focusedItem} />
       <FlatList
         data={rows}

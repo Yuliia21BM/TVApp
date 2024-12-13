@@ -31,6 +31,20 @@ export const styles = StyleSheet.create({
     width: SCREEN_WIDTH * 0.45,
     height: SCREEN_HEIGHT * 0.5,
   },
+  gradientOverlayLeft: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '20%',
+    height: '100%',
+  },
+  gradientOverlayBottom: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    width: '100%',
+    height: '40%',
+  },
   bannerTitle: {
     fontSize: SCALE * 32,
     lineHeight: SCALE * 38,
