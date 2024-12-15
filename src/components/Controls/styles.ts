@@ -30,9 +30,9 @@ export const styles = StyleSheet.create({
     color: Colors.white,
     lineHeight: SCALE * 57,
     fontSize: SCALE * 48,
-    textShadowColor: '#FFFFFF', // Shadow color
-    textShadowOffset: {width: 2, height: 2}, // Shadow position
-    textShadowRadius: 20, // Shadow blur
+    textShadowColor: '#FFFFFF',
+    textShadowOffset: {width: 2, height: 2},
+    textShadowRadius: 20,
   },
   bannerTitle: {
     fontSize: SCALE * 24,
@@ -53,6 +53,10 @@ export const styles = StyleSheet.create({
     width: SCALE * 20,
     height: SCALE * 20,
     borderRadius: SCALE * 10,
+  },
+  focusedSlider: {
+    borderColor: Colors.pink,
+    borderWidth: 2,
   },
   timeWrapper: {
     width: '100%',

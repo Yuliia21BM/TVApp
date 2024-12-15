@@ -1,5 +1,11 @@
-import React, {useEffect, useCallback, useState} from 'react';
-import {FlatList, View, ActivityIndicator} from 'react-native';
+import React, {useEffect, useCallback, useState, useRef} from 'react';
+import {
+  FlatList,
+  View,
+  ActivityIndicator,
+  useTVEventHandler,
+  HWEvent,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {useReduxDispatch, useReduxSelector} from '../../redux/store';
 import {selectAllFromCommon} from '../../redux/selectors';
@@ -9,6 +15,7 @@ import {fetchBanners} from '../../redux/operations';
 import {styles} from './styles';
 import {HomeHeader, ShowsModule} from '../../components';
 import {ErrorScreen} from '../../components/ErrorScreen';
+import {SCALE, SCREEN_HEIGHT} from '../../utils/Constants';
 
 export const HomeScreen = ({
   navigation,
@@ -19,6 +26,8 @@ export const HomeScreen = ({
   const {loading, error, focusedItem, banners, continueWatching} =
     useReduxSelector(selectAllFromCommon);
   const [rows, setRows] = useState<Row[]>([]);
+  const [focusedRow, setFocusedRow] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     dispatch(fetchBanners());
@@ -39,6 +48,52 @@ export const HomeScreen = ({
     ),
     [navigation],
   );
+
+  const getItemLayout = (data: any, index: number) => ({
+    length: SCREEN_HEIGHT * 0.3 + SCALE * 20 + SCALE * 32 + SCALE * 54,
+    offset:
+      (SCREEN_HEIGHT * 0.3 + SCALE * 20 + SCALE * 32 + SCALE * 54) * index,
+    index,
+  });
+
+  const myTVEventHandler = (evt: HWEvent) => {
+    switch (evt.eventType) {
+      case 'up':
+        if (focusedRow > 0) {
+          const newFocusedRow = focusedRow - 1;
+          setFocusedRow(newFocusedRow);
+          try {
+            flatListRef.current?.scrollToIndex({
+              index: newFocusedRow,
+              animated: true,
+            });
+          } catch (error) {
+            console.warn('Error scrolling to index:', error);
+          }
+        }
+        break;
+
+      case 'down':
+        if (focusedRow < rows.length - 1) {
+          const newFocusedRow = focusedRow + 1;
+          setFocusedRow(newFocusedRow);
+          try {
+            flatListRef.current?.scrollToIndex({
+              index: newFocusedRow,
+              animated: true,
+            });
+          } catch (error) {
+            console.warn('Error scrolling to index:', error);
+          }
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  useTVEventHandler(myTVEventHandler);
 
   if (loading) {
     return (
@@ -66,10 +121,16 @@ export const HomeScreen = ({
       />
       <HomeHeader focusedItem={focusedItem} />
       <FlatList
+        ref={flatListRef}
         data={rows}
         renderItem={renderShowsModule}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.contentContainer}
+        getItemLayout={getItemLayout}
+        initialScrollIndex={focusedRow}
+        onScrollToIndexFailed={error => {
+          console.warn('Failed to scroll to index:', error);
+        }}
       />
     </View>
   );

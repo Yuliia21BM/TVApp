@@ -1,12 +1,5 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {
-  Platform,
-  StyleSheet,
-  TVEventControl,
-  BackHandler,
-  Alert,
-  View,
-} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import NetInfo from '@react-native-community/netinfo';
 import {

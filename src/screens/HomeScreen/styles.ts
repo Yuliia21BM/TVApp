@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 import {Colors} from '../../utils/Colors';
-import {APP_PADDING, SCALE} from '../../utils/Constants';
+import {SCALE, SCREEN_HEIGHT} from '../../utils/Constants';
 
 export const styles = StyleSheet.create({
   container: {
@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.primaryBackground,
   },
   contentContainer: {
-    paddingBottom: APP_PADDING,
+    paddingBottom: SCREEN_HEIGHT * 0.55,
   },
   bottomGradient: {
     position: 'absolute',

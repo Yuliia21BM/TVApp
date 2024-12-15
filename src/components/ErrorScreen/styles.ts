@@ -8,9 +8,10 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.primaryBackground,
+    backgroundColor: Colors.black,
   },
   errorText: {
+    width: '70%',
     color: Colors.red,
     fontSize: SCALE * 32,
   },

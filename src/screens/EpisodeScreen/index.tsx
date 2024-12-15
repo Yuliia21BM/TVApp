@@ -1,6 +1,10 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {View} from 'react-native';
-import Video, {OnLoadData, VideoRef} from 'react-native-video';
+import {View, ActivityIndicator} from 'react-native';
+import Video, {
+  OnLoadData,
+  VideoRef,
+  OnVideoErrorData,
+} from 'react-native-video';
 import {useReduxDispatch, useReduxSelector} from '../../redux/store';
 import {selectAllFromCommon} from '../../redux/selectors';
 import {Controls} from '../../components';
@@ -8,6 +12,8 @@ import {SEEK_TIME} from '../../utils/Constants';
 import {styles} from './styles';
 import {updateContinueWatching} from '../../redux/commonSlice';
 import {STACK_SCREENS, StackNavigationProps} from '../../routes/IRoot';
+import {Colors} from '../../utils/Colors';
+import {ErrorScreen} from '../../components/ErrorScreen';
 
 export const EpisodeScreen = ({
   navigation,
@@ -27,6 +33,10 @@ export const EpisodeScreen = ({
     focusedItem?.lastVideoIndex ?? 0,
   );
   const [isNextEpisode, setIsNextEpisode] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isVideoError, setIsVideoError] = useState<OnVideoErrorData | null>(
+    null,
+  );
 
   useEffect(() => {
     if (focusedItem) {
@@ -64,6 +74,7 @@ export const EpisodeScreen = ({
   const onLoad = useCallback(
     (data: OnLoadData) => {
       setIsPaused(false);
+      setIsLoading(false);
 
       setVideoData(prev => ({
         ...prev,
@@ -72,6 +83,8 @@ export const EpisodeScreen = ({
 
       if (videoData.currentTime > 0) {
         videoRef.current?.seek(videoData.currentTime);
+        videoRef.current?.resume();
+        setIsPaused(false);
       }
     },
     [videoData.currentTime],
@@ -103,7 +116,7 @@ export const EpisodeScreen = ({
         }),
       );
     }
-    navigation.navigate(STACK_SCREENS.HOME_SCREEN);
+    navigation.goBack();
   };
 
   const handlePressNextButton = () => {
@@ -131,6 +144,11 @@ export const EpisodeScreen = ({
       setIsNextEpisode(false);
     }
   };
+  const handleVideoError = (error: OnVideoErrorData) => {
+    console.log(error);
+
+    setIsVideoError(error);
+  };
 
   if (!focusedItem?.videos) {
     return <View style={{flex: 1, backgroundColor: 'red'}}></View>;
@@ -139,20 +157,29 @@ export const EpisodeScreen = ({
 
   return (
     <View style={styles.root}>
-      <Video
-        ref={videoRef}
-        controls={false}
-        onPlaybackRateChange={onPlaybackRateChange}
-        paused={isPaused}
-        onLoad={onLoad}
-        resizeMode="contain"
-        onError={err => console.log(err)}
-        onProgress={onProgress}
-        source={{
-          uri: video.src,
-        }}
-        style={styles.video}
-      />
+      {isLoading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.white} />
+        </View>
+      )}
+      {isVideoError ? (
+        <ErrorScreen error={JSON.stringify(isVideoError.error)} />
+      ) : (
+        <Video
+          ref={videoRef}
+          controls={false}
+          onPlaybackRateChange={onPlaybackRateChange}
+          paused={isPaused}
+          onLoad={onLoad}
+          resizeMode="contain"
+          onError={handleVideoError}
+          onProgress={onProgress}
+          source={{
+            uri: video.src,
+          }}
+          style={styles.video}
+        />
+      )}
       <Controls
         currentTime={videoData.currentTime}
         videoDuration={videoData.videoDuration}
@@ -164,6 +191,7 @@ export const EpisodeScreen = ({
         handlePressBackButton={handlePressBackButton}
         handlePressNextButton={handlePressNextButton}
         isNextEpisode={isNextEpisode}
+        setIsPaused={setIsPaused}
       />
     </View>
   );

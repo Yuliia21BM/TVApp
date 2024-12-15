@@ -1695,27 +1695,6 @@ PODS:
     - React-logger (= 0.76.0-0)
     - React-perflogger (= 0.76.0-0)
     - React-utils (= 0.76.0-0)
-  - RNCMaskedView (0.3.2):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
   - RNFastImage (8.6.3):
     - React-Core
     - SDWebImage (~> 5.11.1)
@@ -1850,7 +1829,6 @@ DEPENDENCIES:
   - React-utils (from `../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - "RNCMaskedView (from `../node_modules/@react-native-masked-view/masked-view`)"
   - RNFastImage (from `../node_modules/react-native-fast-image`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBRemoteConfig (from `../node_modules/@react-native-firebase/remote-config`)"
@@ -2008,8 +1986,6 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
-  RNCMaskedView:
-    :path: "../node_modules/@react-native-masked-view/masked-view"
   RNFastImage:
     :path: "../node_modules/react-native-fast-image"
   RNFBApp:
@@ -2099,7 +2075,6 @@ SPEC CHECKSUMS:
   React-utils: 5980f6b687c25067c1259f6be319008402d877f5
   ReactCodegen: 547ca747512fb5a6eaf5fd3498c4adf1032dc43e
   ReactCommon: a914651e1bdb20540e52570b59c7d0120ba668a5
-  RNCMaskedView: 381d041f80e6bf7983d2c058a34362e6a362ce01
   RNFastImage: 5c9c9fed9c076e521b3f509fe79e790418a544e8
   RNFBApp: a3c9c3b23aa2d77001ce62b5a997325927593c12
   RNFBRemoteConfig: 9bf5f58784eb5e6bba1cf83de0144e990479d93d

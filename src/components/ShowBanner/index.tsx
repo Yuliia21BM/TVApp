@@ -1,5 +1,5 @@
-import React, {memo, useCallback, useRef} from 'react';
-import {Animated, Text, TouchableOpacity, View} from 'react-native';
+import React, {memo, useCallback, useRef, useState} from 'react';
+import {Animated, Platform, Text, TouchableOpacity, View} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import {useReduxDispatch} from '../../redux/store';
 import {setFocusedItem} from '../../redux/commonSlice';
@@ -24,11 +24,13 @@ export const ShowBanner = memo(
   }) => {
     const scaleAnim = useRef(new Animated.Value(1)).current;
     const dispatch = useReduxDispatch();
+    const [isFocused, setIsFocused] = useState(false);
 
     const handleFocus = useCallback(
       (item: Banner, index: number) => {
         dispatch(setFocusedItem(item));
         setFocusedIndex(index);
+        setIsFocused(true);
         Animated.timing(scaleAnim, {
           toValue: 1.1,
           duration: 300,
@@ -47,6 +49,7 @@ export const ShowBanner = memo(
     );
 
     const handleBlur = useCallback(() => {
+      setIsFocused(false);
       Animated.timing(scaleAnim, {
         toValue: 1,
         duration: 300,
@@ -59,7 +62,7 @@ export const ShowBanner = memo(
         style={[
           styles.cardContainer,
           {transform: [{scale: scaleAnim}]},
-          focusedIndex === index && styles.cardActive,
+          isFocused && styles.cardActive,
         ]}>
         {item.status && (
           <View
@@ -71,6 +74,9 @@ export const ShowBanner = memo(
           </View>
         )}
         <TouchableOpacity
+          hasTVPreferredFocus={
+            focusedIndex === index && Platform.OS === 'android' ? true : false
+          }
           style={styles.card}
           onFocus={() => handleFocus(item, index)}
           onBlur={handleBlur}
