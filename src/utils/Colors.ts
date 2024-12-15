@@ -9,6 +9,7 @@ export const Colors = {
   pink: '#FF358A',
   green: '#2BCA46',
   violet: '#7B17F6',
+  shadow: 'rgba(21, 10, 53, 0)',
 };
 
 export const StatusColors = {

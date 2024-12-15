@@ -1,7 +1,7 @@
 import {StyleSheet} from 'react-native';
 
 import {Colors} from '../../utils/Colors';
-import {APP_PADDING, SCALE} from '../../utils/Constants';
+import {SCALE} from '../../utils/Constants';
 
 export const styles = StyleSheet.create({
   errorContainer: {

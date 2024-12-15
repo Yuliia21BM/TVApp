@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {RefObject, useCallback, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -6,41 +6,14 @@ import {
   Image,
   useTVEventHandler,
   HWEvent,
-  StyleSheet,
+  TVFocusGuideView,
 } from 'react-native';
 import {Slider} from '@miblanchard/react-native-slider';
 import {styles} from './styles';
 import {Colors} from '../../utils/Colors';
-import {SCALE} from '../../utils/Constants';
-
-enum BUTTONS_LABELS {
-  BACK_BTN_LABEL = 'backBtn',
-  NEXT_BTN_LABEL = 'nextBTN',
-  PLAY_PAUSE_LABEL = 'playPause',
-  SLIDER_LABEL = 'slider',
-}
-
-const getMinutesFromSeconds = (time: number): string => {
-  const minutes = time >= 60 ? Math.floor(time / 60) : 0;
-  const seconds = Math.floor(time - minutes * 60);
-  return `${minutes >= 10 ? minutes : `0${minutes}`}:${
-    seconds >= 10 ? seconds : `0${seconds}`
-  }`;
-};
-
-interface IControls {
-  currentTime: number;
-  videoDuration: number;
-  isPaused: boolean;
-  handlePressPlayPause: () => void;
-  handleSeek: (value: boolean) => void;
-  focusedBannerTitle: string;
-  videTitle: string;
-  handlePressNextButton: () => void;
-  handlePressBackButton: () => void;
-  isNextEpisode: boolean;
-  setIsPaused: (value: boolean) => void;
-}
+import {useFocusEffect} from '@react-navigation/native';
+import {getMinutesFromSeconds} from '../../utils';
+import {BUTTONS_LABELS, ControlsTypes} from './types';
 
 export function Controls({
   currentTime,
@@ -54,79 +27,56 @@ export function Controls({
   handlePressBackButton,
   isNextEpisode,
   setIsPaused,
-}: IControls): React.JSX.Element {
+}: ControlsTypes): React.JSX.Element {
   const [focusedItem, setFocusedItem] = useState(BUTTONS_LABELS.BACK_BTN_LABEL);
+  const [horizontalDestination, setHorizontalDestination] =
+    useState<RefObject<View> | null>(null);
+  const [verticalDestination, setVerticalDestination] =
+    useState<RefObject<View> | null>(null);
+
+  const sliderRef = useRef<View>(null);
+  const playPauseRef = useRef<View>(null);
+  const backRef = useRef<View>(null);
 
   const handleTVEvent = useCallback(
     (evt: HWEvent) => {
-      if (evt.eventType === 'right') {
-        if (focusedItem === BUTTONS_LABELS.BACK_BTN_LABEL && isNextEpisode) {
-          setFocusedItem(BUTTONS_LABELS.NEXT_BTN_LABEL);
-        } else if (focusedItem === BUTTONS_LABELS.PLAY_PAUSE_LABEL) {
-          setFocusedItem(BUTTONS_LABELS.SLIDER_LABEL);
-          setIsPaused(true);
-        } else if (focusedItem === BUTTONS_LABELS.SLIDER_LABEL && isPaused) {
+      if (focusedItem === BUTTONS_LABELS.SLIDER_LABEL) {
+        if (evt.eventType === 'right') {
           handleSeek(true);
-        }
-      } else if (evt.eventType === 'longRight') {
-        if (focusedItem === BUTTONS_LABELS.SLIDER_LABEL && isPaused) {
-          handleSeek(true);
-        }
-      } else if (evt.eventType === 'left') {
-        if (focusedItem === BUTTONS_LABELS.NEXT_BTN_LABEL) {
-          setFocusedItem(BUTTONS_LABELS.BACK_BTN_LABEL);
-        } else if (focusedItem === BUTTONS_LABELS.SLIDER_LABEL) {
-          if (isPaused) {
-            handleSeek(false);
-          } else {
-            setFocusedItem(BUTTONS_LABELS.PLAY_PAUSE_LABEL);
-          }
-        }
-      } else if (evt.eventType === 'longLeft') {
-        if (focusedItem === BUTTONS_LABELS.SLIDER_LABEL && isPaused) {
+        } else if (evt.eventType === 'left') {
           handleSeek(false);
-        }
-      } else if (evt.eventType === 'down') {
-        if (
-          focusedItem === BUTTONS_LABELS.BACK_BTN_LABEL ||
-          focusedItem === BUTTONS_LABELS.NEXT_BTN_LABEL
+        } else if (
+          evt.eventType === 'select' ||
+          evt.eventType === 'playPause'
         ) {
-          setFocusedItem(BUTTONS_LABELS.PLAY_PAUSE_LABEL);
-        }
-      } else if (evt.eventType === 'up') {
-        if (
-          focusedItem === BUTTONS_LABELS.PLAY_PAUSE_LABEL ||
-          focusedItem === BUTTONS_LABELS.SLIDER_LABEL
-        ) {
-          setFocusedItem(BUTTONS_LABELS.BACK_BTN_LABEL);
-        }
-      } else if (evt.eventType === 'playPause' || evt.eventType === 'select') {
-        if (focusedItem === BUTTONS_LABELS.SLIDER_LABEL) {
-          setFocusedItem(BUTTONS_LABELS.PLAY_PAUSE_LABEL);
-          setIsPaused(false);
+          playPauseRef.current?.requestTVFocus();
         }
       }
     },
-    [
-      focusedItem,
-      isNextEpisode,
-      isPaused,
-      currentTime,
-      handleSeek,
-      handlePressPlayPause,
-    ],
+    [focusedItem, handleSeek],
   );
 
   useTVEventHandler(handleTVEvent);
+
+  useFocusEffect(
+    useCallback(() => {
+      setTimeout(() => {
+        playPauseRef.current?.requestTVFocus();
+      }, 100);
+    }, []),
+  );
 
   return (
     <View style={styles.root}>
       <View style={styles.topCantainer}>
         <TouchableOpacity
           activeOpacity={1}
-          hasTVPreferredFocus={focusedItem === BUTTONS_LABELS.BACK_BTN_LABEL}
+          ref={backRef}
           onPress={handlePressBackButton}
-          onFocus={() => setFocusedItem(BUTTONS_LABELS.BACK_BTN_LABEL)}>
+          onFocus={() => {
+            setFocusedItem(BUTTONS_LABELS.BACK_BTN_LABEL);
+            setVerticalDestination(playPauseRef);
+          }}>
           <Image
             source={
               focusedItem === BUTTONS_LABELS.BACK_BTN_LABEL
@@ -139,9 +89,11 @@ export function Controls({
         {isNextEpisode && (
           <TouchableOpacity
             activeOpacity={1}
-            hasTVPreferredFocus={focusedItem === BUTTONS_LABELS.NEXT_BTN_LABEL}
             onPress={handlePressNextButton}
-            onFocus={() => setFocusedItem(BUTTONS_LABELS.NEXT_BTN_LABEL)}>
+            onFocus={() => {
+              setFocusedItem(BUTTONS_LABELS.NEXT_BTN_LABEL);
+              setVerticalDestination(playPauseRef);
+            }}>
             <Image
               source={
                 focusedItem === BUTTONS_LABELS.NEXT_BTN_LABEL
@@ -153,56 +105,86 @@ export function Controls({
           </TouchableOpacity>
         )}
       </View>
-      <View style={{flex: 1, justifyContent: 'flex-end', gap: 50}}>
+      <View style={styles.focusView}>
+        <TVFocusGuideView
+          destinations={
+            verticalDestination?.current ? [verticalDestination.current] : []
+          }
+        />
+      </View>
+      <View style={styles.textContainer}>
         <View style={styles.middleTextContainer}>
           <Text style={styles.videoTitle}>{videTitle}</Text>
           <Text style={styles.bannerTitle}>{focusedBannerTitle}</Text>
         </View>
         <View style={styles.footer}>
-          <TouchableOpacity
-            activeOpacity={1}
-            hasTVPreferredFocus={
-              focusedItem === BUTTONS_LABELS.PLAY_PAUSE_LABEL
-            }
-            onPress={handlePressPlayPause}
-            onFocus={() => setFocusedItem(BUTTONS_LABELS.PLAY_PAUSE_LABEL)}>
-            <Image
-              source={
-                isPaused
-                  ? focusedItem === BUTTONS_LABELS.PLAY_PAUSE_LABEL
-                    ? require('../../../assets/icons/PlayActive.png')
-                    : require('../../../assets/icons/Play.png')
-                  : focusedItem === BUTTONS_LABELS.PLAY_PAUSE_LABEL
-                  ? require('../../../assets/icons/PauseActive.png')
-                  : require('../../../assets/icons/Pause.png')
-              }
-              style={styles.playPauseButton}
-            />
-          </TouchableOpacity>
+          <TVFocusGuideView
+            destinations={
+              horizontalDestination?.current
+                ? [horizontalDestination.current]
+                : []
+            }>
+            <TouchableOpacity
+              activeOpacity={1}
+              ref={playPauseRef}
+              onPress={handlePressPlayPause}
+              onFocus={() => {
+                setFocusedItem(BUTTONS_LABELS.PLAY_PAUSE_LABEL);
+                setHorizontalDestination(sliderRef);
+                setVerticalDestination(backRef);
+              }}>
+              <Image
+                source={
+                  isPaused
+                    ? focusedItem === BUTTONS_LABELS.PLAY_PAUSE_LABEL
+                      ? require('../../../assets/icons/PlayActive.png')
+                      : require('../../../assets/icons/Play.png')
+                    : focusedItem === BUTTONS_LABELS.PLAY_PAUSE_LABEL
+                    ? require('../../../assets/icons/PauseActive.png')
+                    : require('../../../assets/icons/Pause.png')
+                }
+                style={styles.playPauseButton}
+              />
+            </TouchableOpacity>
+          </TVFocusGuideView>
           <Text style={styles.timeText}>
             {getMinutesFromSeconds(currentTime)}
           </Text>
-          <Slider
-            value={currentTime}
-            maximumValue={videoDuration}
-            containerStyle={StyleSheet.flatten([
-              {flex: 1, height: SCALE * 40},
-              focusedItem === BUTTONS_LABELS.SLIDER_LABEL
-                ? {
-                    borderColor: Colors.pink,
-                    borderWidth: 2,
-                  }
-                : {
-                    borderColor: Colors.dimGray,
-                    borderWidth: 1,
-                  },
-            ])}
-            thumbStyle={styles.sliderThumb}
-            minimumTrackTintColor={Colors.pink}
-            maximumTrackTintColor={Colors.white}
-            thumbTintColor={Colors.pink}
-          />
-
+          <TVFocusGuideView
+            style={styles.sliderWrapper}
+            destinations={
+              horizontalDestination?.current
+                ? [horizontalDestination.current]
+                : []
+            }>
+            <TouchableOpacity
+              activeOpacity={1}
+              ref={sliderRef}
+              style={[
+                styles.slider,
+                focusedItem === BUTTONS_LABELS.SLIDER_LABEL &&
+                  styles.focusedSlider,
+              ]}
+              onFocus={() => {
+                setHorizontalDestination(sliderRef);
+                setIsPaused(true);
+                setTimeout(() => {
+                  setFocusedItem(BUTTONS_LABELS.SLIDER_LABEL);
+                }, 100);
+              }}
+              onBlur={() => {
+                setIsPaused(false);
+              }}>
+              <Slider
+                value={currentTime}
+                maximumValue={videoDuration}
+                thumbStyle={styles.sliderThumb}
+                minimumTrackTintColor={Colors.pink}
+                maximumTrackTintColor={Colors.white}
+                thumbTintColor={Colors.pink}
+              />
+            </TouchableOpacity>
+          </TVFocusGuideView>
           <Text style={styles.timeText}>
             {getMinutesFromSeconds(videoDuration)}
           </Text>

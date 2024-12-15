@@ -5,3 +5,4 @@ export const selectFocusedItem = (state: RootState) => state.common.focusedItem;
 export const selectError = (state: RootState) => state.common.error;
 export const selectLoading = (state: RootState) => state.common.loading;
 export const selectAllFromCommon = (state: RootState) => state.common;
+export const selectIsFirstLoad = (state: RootState) => state.common.isFirstLoad;

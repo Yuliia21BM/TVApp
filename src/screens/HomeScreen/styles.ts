@@ -1,6 +1,6 @@
 import {StyleSheet} from 'react-native';
 import {Colors} from '../../utils/Colors';
-import {SCALE, SCREEN_HEIGHT} from '../../utils/Constants';
+import {SCALE} from '../../utils/Constants';
 
 export const styles = StyleSheet.create({
   container: {
@@ -14,7 +14,8 @@ export const styles = StyleSheet.create({
     backgroundColor: Colors.primaryBackground,
   },
   contentContainer: {
-    paddingBottom: SCREEN_HEIGHT * 0.55,
+    height: SCALE * 520,
+    overflow: 'visible',
   },
   bottomGradient: {
     position: 'absolute',

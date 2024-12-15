@@ -2,7 +2,7 @@ import remoteConfig from '@react-native-firebase/remote-config';
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {Row} from './types';
 
-export const fetchBannersFromRemoteConfig = async (): Promise<any[]> => {
+export const fetchBannersFromRemoteConfig = async (): Promise<Row[]> => {
   try {
     await remoteConfig().fetchAndActivate();
 

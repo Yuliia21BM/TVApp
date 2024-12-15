@@ -1,13 +1,18 @@
-import {memo, useState} from 'react';
-import {Row} from '../../redux/types';
-import {StackNavigationProps} from '../../routes/IRoot';
+import React, {memo, useState} from 'react';
 import {FlatList, Text, View} from 'react-native';
 import {SCALE, SCREEN_HEIGHT} from '../../utils/Constants';
 import {styles} from './styles';
 import {ShowBanner} from '../ShowBanner';
+import {ShowsModuleProps} from './types';
 
 export const ShowsModule = memo(
-  ({item, navigation}: {item: Row; navigation: StackNavigationProps}) => {
+  ({
+    item,
+    navigation,
+    onFocusCallback,
+    setSelectedShowRef,
+    isFirstRow,
+  }: ShowsModuleProps) => {
     const [focusedIndex, setFocusedIndex] = useState(0);
 
     return (
@@ -21,10 +26,13 @@ export const ShowsModule = memo(
               index={index}
               setFocusedIndex={setFocusedIndex}
               navigation={navigation}
-              focusedIndex={focusedIndex}
+              onFocusCallback={onFocusCallback}
+              setSelectedShowRef={setSelectedShowRef}
+              isFirstRow={isFirstRow}
+              isLastElementInRow={index === item.data.length - 1}
             />
           )}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={el => el.id.toString()}
           horizontal
           contentContainerStyle={styles.sectionContainer}
           style={{

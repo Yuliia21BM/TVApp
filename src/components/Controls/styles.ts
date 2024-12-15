@@ -26,6 +26,11 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     gap: SCALE * 24,
   },
+  textContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    gap: 50,
+  },
   videoTitle: {
     color: Colors.white,
     lineHeight: SCALE * 57,
@@ -39,6 +44,10 @@ export const styles = StyleSheet.create({
     lineHeight: SCALE * 29,
     color: Colors.white,
   },
+  focusView: {
+    width: '100%',
+    height: 1,
+  },
   footer: {
     width: '100%',
     flexDirection: 'row',
@@ -47,20 +56,17 @@ export const styles = StyleSheet.create({
   },
   sliderWrapper: {
     flex: 1,
-    height: SCALE * 10,
   },
   sliderThumb: {
     width: SCALE * 20,
     height: SCALE * 20,
     borderRadius: SCALE * 10,
   },
+  slider: {
+    borderWidth: 1,
+  },
   focusedSlider: {
     borderColor: Colors.pink,
-    borderWidth: 2,
-  },
-  timeWrapper: {
-    width: '100%',
-    alignItems: 'flex-end',
   },
   timeText: {
     fontSize: SCALE * 24,

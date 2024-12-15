@@ -1,37 +1,44 @@
+import React from 'react';
 import {Text, View} from 'react-native';
 import FastImage from 'react-native-fast-image';
 import LinearGradient from 'react-native-linear-gradient';
-import {Banner} from '../../redux/types';
 import {styles} from './styles';
+import {HomeHeaderProps} from './types';
+import {Colors} from '../../utils/Colors';
 
-export const HomeHeader = ({focusedItem}: {focusedItem: Banner | null}) => (
-  <>
-    <View style={styles.maskedView}>
-      <FastImage
-        style={styles.bannerImage}
-        source={{uri: focusedItem?.banner}}
-      />
-      <LinearGradient
-        colors={['#150A35', 'rgba(21, 10, 53, 0)']}
-        style={styles.gradientOverlayLeft}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 0}}
-      />
-      <LinearGradient
-        colors={['#150A35', 'rgba(21, 10, 53, 0)']}
-        style={styles.gradientOverlayBottom}
-        start={{x: 0, y: 1}}
-        end={{x: 0, y: 0}}
-      />
+export const HomeHeader: React.FC<HomeHeaderProps> = ({focusedItem}) => {
+  const bannerImageSource = {uri: focusedItem?.banner};
+  const logoSource = require('../../../assets/images/logo.png');
+
+  return (
+    <View style={styles.container}>
+      {/* Masked View */}
+      <View style={styles.maskedView}>
+        <FastImage style={styles.bannerImage} source={bannerImageSource} />
+        <LinearGradient
+          colors={[Colors.primaryBackground, Colors.shadow]}
+          style={styles.gradientOverlayLeft}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 0}}
+        />
+        <LinearGradient
+          colors={[Colors.primaryBackground, Colors.shadow]}
+          style={styles.gradientOverlayBottom}
+          start={{x: 0, y: 1}}
+          end={{x: 0, y: 0}}
+        />
+      </View>
+
+      {/* Top Section */}
+      <View style={styles.topSection}>
+        <FastImage
+          source={logoSource}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        <Text style={styles.bannerTitle}>{focusedItem?.title}</Text>
+        <Text style={styles.bannerDescription}>{focusedItem?.description}</Text>
+      </View>
     </View>
-    <View style={styles.topSection}>
-      <FastImage
-        source={require('../../../assets/images/logo.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.bannerTitle}>{focusedItem?.title}</Text>
-      <Text style={styles.bannerDescription}>{focusedItem?.description}</Text>
-    </View>
-  </>
-);
+  );
+};

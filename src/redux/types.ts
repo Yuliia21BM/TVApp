@@ -33,4 +33,5 @@ export interface CommonState {
   focusedItem: Banner | null;
   loading: boolean;
   error: string | null;
+  isFirstLoad: boolean;
 }

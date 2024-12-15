@@ -12,6 +12,7 @@ const initialState: CommonState = {
   focusedItem: null,
   loading: false,
   error: null,
+  isFirstLoad: false,
 };
 
 const commonSlice = createSlice({
@@ -55,6 +56,10 @@ const commonSlice = createSlice({
       ...state,
       focusedItem: action.payload,
     }),
+    setIsFirstLoad: (state, action: PayloadAction<boolean>) => ({
+      ...state,
+      isFirstLoad: action.payload,
+    }),
   },
   extraReducers: builder => {
     builder
@@ -80,6 +85,7 @@ export const {
   updateContinueWatching,
   removeContinueWatchingBanner,
   setFocusedItem,
+  setIsFirstLoad,
 } = commonSlice.actions;
 
 export default commonSlice.reducer;

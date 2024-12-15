@@ -1,21 +1,21 @@
-import React, {useEffect, useCallback, useState, useRef} from 'react';
-import {
-  FlatList,
-  View,
-  ActivityIndicator,
-  useTVEventHandler,
-  HWEvent,
-} from 'react-native';
+import React, {
+  useEffect,
+  useCallback,
+  useState,
+  useRef,
+  RefObject,
+} from 'react';
+import {FlatList, View, ActivityIndicator} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {useReduxDispatch, useReduxSelector} from '../../redux/store';
 import {selectAllFromCommon} from '../../redux/selectors';
 import {type Row} from '../../redux/types';
-import {StackNavigationProps} from '../../routes/IRoot';
+import {StackNavigationProps} from '../../routes/types';
 import {fetchBanners} from '../../redux/operations';
 import {styles} from './styles';
 import {HomeHeader, ShowsModule} from '../../components';
 import {ErrorScreen} from '../../components/ErrorScreen';
-import {SCALE, SCREEN_HEIGHT} from '../../utils/Constants';
+import {useFocusEffect} from '@react-navigation/native';
 
 export const HomeScreen = ({
   navigation,
@@ -23,11 +23,11 @@ export const HomeScreen = ({
   navigation: StackNavigationProps;
 }) => {
   const dispatch = useReduxDispatch();
-  const {loading, error, focusedItem, banners, continueWatching} =
+  const {loading, error, focusedItem, banners, continueWatching, isFirstLoad} =
     useReduxSelector(selectAllFromCommon);
   const [rows, setRows] = useState<Row[]>([]);
-  const [focusedRow, setFocusedRow] = useState(0);
   const flatListRef = useRef<FlatList>(null);
+  const [selectedShowRef, setSelectedShowRef] = useState<RefObject<View>>();
 
   useEffect(() => {
     dispatch(fetchBanners());
@@ -42,59 +42,33 @@ export const HomeScreen = ({
     setRows(newRows);
   }, [continueWatching, banners]);
 
+  const onFocusCallback = useCallback((rowIndex: number) => {
+    flatListRef.current?.scrollToIndex({
+      index: rowIndex,
+      animated: true,
+    });
+  }, []);
+
   const renderShowsModule = useCallback(
-    ({item}: {item: Row}) => (
-      <ShowsModule item={item} navigation={navigation} />
+    ({item, index}: {item: Row; index: number}) => (
+      <ShowsModule
+        item={item}
+        navigation={navigation}
+        setSelectedShowRef={setSelectedShowRef}
+        isFirstRow={!index}
+        onFocusCallback={() => onFocusCallback(index)}
+      />
     ),
-    [navigation],
+    [isFirstLoad, navigation, onFocusCallback],
   );
 
-  const getItemLayout = (data: any, index: number) => ({
-    length: SCREEN_HEIGHT * 0.3 + SCALE * 20 + SCALE * 32 + SCALE * 54,
-    offset:
-      (SCREEN_HEIGHT * 0.3 + SCALE * 20 + SCALE * 32 + SCALE * 54) * index,
-    index,
-  });
-
-  const myTVEventHandler = (evt: HWEvent) => {
-    switch (evt.eventType) {
-      case 'up':
-        if (focusedRow > 0) {
-          const newFocusedRow = focusedRow - 1;
-          setFocusedRow(newFocusedRow);
-          try {
-            flatListRef.current?.scrollToIndex({
-              index: newFocusedRow,
-              animated: true,
-            });
-          } catch (error) {
-            console.warn('Error scrolling to index:', error);
-          }
-        }
-        break;
-
-      case 'down':
-        if (focusedRow < rows.length - 1) {
-          const newFocusedRow = focusedRow + 1;
-          setFocusedRow(newFocusedRow);
-          try {
-            flatListRef.current?.scrollToIndex({
-              index: newFocusedRow,
-              animated: true,
-            });
-          } catch (error) {
-            console.warn('Error scrolling to index:', error);
-          }
-        }
-        break;
-
-      default:
-        break;
-    }
-  };
-
-  useTVEventHandler(myTVEventHandler);
-
+  useFocusEffect(
+    useCallback(() => {
+      setTimeout(() => {
+        selectedShowRef?.current?.requestTVFocus();
+      }, 200);
+    }, [selectedShowRef]),
+  );
   if (loading) {
     return (
       <ActivityIndicator size="large" color="white" style={styles.loader} />
@@ -107,6 +81,7 @@ export const HomeScreen = ({
 
   return (
     <View style={styles.container}>
+      {/* Masked View */}
       <LinearGradient
         colors={['#150A35', 'rgba(21, 10, 53, 0)']}
         style={styles.bottomGradient}
@@ -125,12 +100,7 @@ export const HomeScreen = ({
         data={rows}
         renderItem={renderShowsModule}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.contentContainer}
-        getItemLayout={getItemLayout}
-        initialScrollIndex={focusedRow}
-        onScrollToIndexFailed={error => {
-          console.warn('Failed to scroll to index:', error);
-        }}
+        style={styles.contentContainer}
       />
     </View>
   );

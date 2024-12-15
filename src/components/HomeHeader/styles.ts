@@ -9,6 +9,10 @@ import {
 } from '../../utils/Constants';
 
 export const styles = StyleSheet.create({
+  container: {
+    zIndex: 10,
+    backgroundColor: Colors.primaryBackground,
+  },
   topSection: {
     paddingHorizontal: APP_PADDING,
     paddingVertical: 10,

@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {View, ActivityIndicator} from 'react-native';
+import {View, ActivityIndicator, BackHandler} from 'react-native';
 import Video, {
   OnLoadData,
   VideoRef,
@@ -11,7 +11,7 @@ import {Controls} from '../../components';
 import {SEEK_TIME} from '../../utils/Constants';
 import {styles} from './styles';
 import {updateContinueWatching} from '../../redux/commonSlice';
-import {STACK_SCREENS, StackNavigationProps} from '../../routes/IRoot';
+import {StackNavigationProps} from '../../routes/types';
 import {Colors} from '../../utils/Colors';
 import {ErrorScreen} from '../../components/ErrorScreen';
 
@@ -29,7 +29,7 @@ export const EpisodeScreen = ({
     videoDuration: 0,
   });
   const [isPaused, setIsPaused] = useState(false);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState<number>(
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(
     focusedItem?.lastVideoIndex ?? 0,
   );
   const [isNextEpisode, setIsNextEpisode] = useState(true);
@@ -41,20 +41,20 @@ export const EpisodeScreen = ({
   useEffect(() => {
     if (focusedItem) {
       setCurrentVideoIndex(focusedItem.lastVideoIndex ?? 0);
-      setVideoData(prev => ({
-        ...prev,
-        currentTime: focusedItem.time ?? 0,
-      }));
+      setVideoData(prev => ({...prev, currentTime: focusedItem.time ?? 0}));
+      if (focusedItem.videos.length - 1 === focusedItem.lastVideoIndex) {
+        setIsNextEpisode(false);
+      }
     }
-  }, [focusedItem]);
 
-  useEffect(() => {
-    if (
-      focusedItem &&
-      focusedItem.videos.length - 1 === focusedItem.lastVideoIndex
-    ) {
-      setIsNextEpisode(false);
-    }
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handlePressBackButton,
+    );
+
+    return () => {
+      backHandler.remove();
+    };
   }, [focusedItem]);
 
   const onProgress = useCallback(({currentTime}: {currentTime: number}) => {
@@ -117,6 +117,8 @@ export const EpisodeScreen = ({
       );
     }
     navigation.goBack();
+
+    return true;
   };
 
   const handlePressNextButton = () => {
@@ -144,6 +146,7 @@ export const EpisodeScreen = ({
       setIsNextEpisode(false);
     }
   };
+
   const handleVideoError = (error: OnVideoErrorData) => {
     console.log(error);
 
